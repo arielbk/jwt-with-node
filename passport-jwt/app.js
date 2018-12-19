@@ -22,7 +22,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: 'passport-tutorial', cookie: {maxAge: 60000 }, resave:false, saveUninitialized: false }));
+if (!isProduction) app.use(errorHandler());
 
+// Configure Mongoose
+mongoose.connect('mongodb://localhost/jwt-play');
+mongoose.set('debug', true);
+
+// Models & routes
+require('./models/Users');
+require('./config/passport');
+app.use(require('./routes'));
+
+// Error handlers and middleware
 if (!isProduction) {
   app.use((err, req, res) => {
     res.status(err.status || 500);
